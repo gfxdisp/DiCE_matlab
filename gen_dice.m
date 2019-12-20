@@ -1,4 +1,4 @@
-function [L, R] = gen_dice(I_l, I_r, indicator, show_plot)
+function [L, R] = gen_dice(I_l, I_r, indicator, show_plot, flip_tc)
 
 % Generate DiCE images with enhanced contrast 
 % 
@@ -7,6 +7,8 @@ function [L, R] = gen_dice(I_l, I_r, indicator, show_plot)
 % I_r: input right-image of range [0,1] in gamma-corrected space 
 % indicator: target ratio of contrast
 % show_plot: if true plot the tone-curves
+% flip_tc: if true flip the order of the two tone-curves applied to the two
+% images, set to false by default
 % 
 % Outputs
 % L, R: images processed by DiCE
@@ -35,8 +37,12 @@ dev = 1.35*(1-indicator)/(1+indicator);
 
 % process images with interleaved tone-curves in the logarithmic domain
 segs = 2; % number of linear segments
-L_l_out=L_l_in + interleave(-2.7, 0, L_l_in, segs, dev);
-L_r_out=L_r_in - interleave(-2.7, 0, L_r_in, segs, dev);
+flip = 1;
+if exist('flip_tc') && flip_tc
+    flip = -1;
+end
+L_l_out=L_l_in + flip*interleave(-2.7, 0, L_l_in, segs, dev);
+L_r_out=L_r_in - flip*interleave(-2.7, 0, L_r_in, segs, dev);
 
 % plot DiCE interleaved tone-curves
 if show_plot
